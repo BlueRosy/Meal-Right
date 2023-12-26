@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Log In Page</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link href="../static/favicon.ico" rel="icon">
+    <link rel='stylesheet' type='text/css' media='screen' href='../static/styles.css'>
+    <link rel='stylesheet' type='text/css' media='screen' href='../static/register.css'>
+    <link rel='stylesheet' type='text/css' media='screen' href='../static/form.css'>
+    
+</head>
+<body>
+    <header>   
+        <!-- 左上角的标题 -->
+        <section class="header--logo">
+            <a href="/" class="link-nodecoration"><img src="../static/ezgif.com-gif-maker.gif" alt="hair boy" width="80" height="80">
+                <h1 class="nowrap">Meal Right</h1></a>
+        </section>
+        
+        <!-- 右上角的nav-bar -->
+        <nav class="nav-bar">
+            {% if session["user_id"] %}
+                <ul>
+                    <li><a href="/search">Add Food</a></li>
+                    <!-- current food bag, check whether user wants to add this food bag into its diary, user could either clear all or add some, or delete some food items -->
+                    <li><a href="/foodbag">Food Bag</a></li>
+                    
+                    <!-- user's food bag history -->
+                    <li><a href="/calorie_diary">Cal Diary</a></li>
+                </ul>
+                <ul>
+                    <li><a href="/logout">Log Out</a></li>
+                </ul>     
+            {% else %}
+                <ul>
+                    <li><a href="/register">Register</a></li>
+                    <li><a href="/login">Log In</a></li>
+                </ul>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main>
+        <form action="/login" method="post">
+            <h2 class="header-margin">Welcome Back !</h2>
+            <!-- #7abefe -->
+            <img src="../static/bear3.png" alt="" class="image-block" width="200" height="200">
+            <div class="input-box-style">
+                <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="username" name="username" placeholder="Username" type="text">
+            </div>
+            <div class="input-box-style">
+                <input class="form-control mx-auto w-auto" id="password" name="password" placeholder="Password" type="password">
+            </div>
+            <button class="submit-button-style" type="submit">Log In</button>
+        </form>
+    </main>
+
+    <footer>
+        <span class="nowrap">Copyright &copy; <time id="year"></time></span>
+        <span class="nowrap">Rose Design</span>
+    </footer>
+
+
+</body>
+</html>

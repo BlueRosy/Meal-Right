@@ -1,0 +1,383 @@
+main {
+    background: none;
+    display: flex;
+    flex-flow:column wrap;
+    justify-content: center;
+    align-items: center;
+    /* grid-template: 50px 1fr 50px / repeat(6, 1fr); */
+}
+
+.nutrition_table {
+    padding: 1rem;
+    /* table by default display is not a block and overflow cannot be used */
+    display: block;
+    margin: 0 auto;
+    border-spacing: 1em;
+    border-radius: 10px;
+    width: 500px;
+    max-width: 80%;
+    max-height: calc(100% - 200px);
+    overflow: auto;
+}
+
+/* || SET UP TABLE ELEMENT CSS */
+
+.nutrition--summaryStats tr,
+.nutrition--summaryStats td{
+    color:	#ff8072;
+    font-weight: bold;
+    border-bottom: 0.1rem dashed #f87c7c;
+}
+
+
+.nutrition--summaryStats td:nth-child(3),
+.nutrition--summaryStats td:last-child {
+    text-align: right;
+}
+
+.nutrition--datatable td {
+    font-size: smaller;
+}
+
+.nutrition--datatable tr td:nth-child(3),
+.nutrition--datatable tr td:last-child {
+    text-align:right;
+    vertical-align: center;
+}
+
+
+.nutrition_table tfoot td:last-child {
+    text-align: right;
+}
+
+.nutrition--footer {
+    /* border-top:0.1rem dashed #252519; */
+    border-top:0.1rem dashed #84b7ff;
+    padding-top: 1rem;
+}
+
+
+.nutrition_table tfoot button {
+    width: 110px;
+    /* height: 40px; */
+    margin: 0 auto;
+    /* border: 1px solid #cfdef3; */
+    border:0;
+    font-weight: bold;
+    font-family: 'Comfortaa', sans-serif;
+    border-radius: 0.5em;
+    padding: 1em;
+}
+
+#button-unique-style {
+    padding: 1em;
+}
+
+.nutrition_table tfoot a{
+    display: flex;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    justify-content: center;
+    font-weight: bold;
+    padding: 1em;
+    border-radius: 0.5em;
+}
+
+/* Styling for button + a tag (no additive padding) */
+.nutrition_table tfoot .no-padding-button {
+    padding: 0;
+}
+
+.nutrition_table tfoot a:hover,
+.addbag-cell button:hover,
+.nutrition_table tfoot button:hover,
+.calorie_diary_table button:hover {
+    /* background-color:#f8baba;
+    color:#ea527e; */
+    background-color:#f9d0be;
+    color:#ff8072;
+    font-weight: bold;
+}
+
+/* SET UP searchresult page button and input box css */
+.addbag-cell input,
+.nutrition_table tfoot input,
+.addbag-cell button {
+    display: block;
+    width: 200px;
+    height: 40px;
+    text-align: center;
+    font-family: 'Comfortaa', sans-serif;
+    font-weight: bold;
+    border-radius: 0.5em;
+    border: 1px dotted #252519;
+}
+
+.addbag-cell form {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+/* MAKE A FORM DISPLAY AS an inline-block element
+so that 2 buttons can display in the same line in a cell */
+#remove-all-form {
+    display: inline-block;
+}
+
+#button-box form,
+#button-box button {
+    vertical-align: middle;
+}
+
+/* || edit modal element for all "edit amount", "save in Cal Diary" button, and "put back to foodbag" button in details in cal Diary page */
+.modal,
+.save_diary_modal,
+.recoverFoodModal {
+    margin: auto;
+    padding: 1rem;
+    width: min(500px, 60%);
+    border-radius: 0.5rem;
+}
+
+.modal form,
+.save_diary_modal form,
+.recoverFoodModal form {
+    display: flex;
+    flex-flow: column wrap;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal h2,
+.modal p,
+.save_diary_modal h2,
+.save_diary_modal p,
+.recoverFoodModal h2,
+.recoverFoodModal p {
+    text-align: center;
+}
+
+.modal .dialog--buttons,
+.save_diary_modal .dialog--buttons,
+.recoverFoodModal .dialog--buttons {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal button,
+.recoverFoodModal button {
+    width: 100px;
+}
+
+.modal .hintfooter,
+.save_diary_modal .hintfooter,
+.recoverFoodModal .hintfooter {
+    font-size: 10px;
+    text-align: center;
+}
+
+/* || edit extra modal element for save in Cal Diary button */
+.save_diary_modal .dialog--buttons button {
+    width: 100px;
+    border: 1px dotted #252519;
+}
+
+/* || edit extra modal element for "put back to foodbag" button" */
+.recoverFoodModal form input,
+.recoverFoodModal .dialog--buttons button {
+    display: block;
+    width: 200px;
+    height: 40px;
+    text-align: center;
+    font-family: 'Comfortaa', sans-serif;
+    font-weight: bold;
+    border-radius: 0.5em;
+    border: 1px dotted #252519;
+}
+
+.recoverFoodModal .dialog--buttons button {
+    width: 100px;
+    height: auto;
+    padding: 1em;
+    border: 1px dotted #252519;
+}
+
+.recoverFoodModal button:hover {
+    background-color:#f9d0be;
+    color:#ff8072;
+    font-weight: bold;
+}
+
+.recoverFoodModal {
+    font-size: medium;
+}
+
+/* CLEAR the recover-open-button styling */
+.recover-openbutton {
+    border: 0;
+    background: none;
+    font-family:'Comfortaa', sans-serif;
+    font-size: small;
+    text-align: left;
+    padding: 5px;
+}
+
+.recover-openbutton:hover,
+.recover-openbutton:focus {
+    border: 2px dashed #ff8072;
+    border-radius: 0.5rem;
+    padding: 3px;
+}
+
+/* || Cal Diary Page Styling */
+.calorie_diary_table {
+    width: min(650px, 80%);
+}
+
+
+.calorie_diary_table tbody tr td:first-child,
+.calorie_diary_table tbody tr td:nth-child(3){
+    text-align: left;
+}
+
+.calorie_diary_table tbody tr td:nth-child(2),
+.calorie_diary_table tbody tr td:nth-child(4),
+.calorie_diary_table tbody tr td:nth-child(5) {
+    text-align: center;
+}
+
+
+.calorie_diary_table button {
+    width: 80px;
+    padding: 0.5em;
+    font-weight: bold;
+    font-family: 'Comfortaa', sans-serif;
+    border:1px dotted #252519;
+    border-radius: 0.5em;
+}
+
+/* || history_details DATE title Styling */
+.checkDate-Style {
+    font-weight: bold;
+    border: 1px dashed #2c84ff;
+    border-radius: 0.5rem;
+    padding:1rem;
+    text-align: center;
+}
+
+
+/* || searchResult Page NurtitionDetailsModals Styling */
+.nutritionDetailModal {
+    margin: auto;
+    max-width: 80%;
+    padding-top: 1rem;
+    /* height: 600px; */
+    max-height: min(80%, 600px);
+    border-radius: 0.5rem;
+    position: relative;
+}
+
+.open-button {
+    font-family: 'Comfortaa', sans-serif;
+    font-size: medium;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    padding:7px;
+    
+}
+
+.open-button:hover,
+.open-button:focus {
+    border: 2px dashed #ff8072;
+    border-radius: 0.5rem;
+    padding: 5px;
+}
+
+.nutritionDetailModal .close-button {
+    position: absolute;
+    top:20px;
+    right:30px;
+    border: 0;
+    font-weight: bolder;
+    font-size: 20px;
+    background-color: transparent;
+}
+
+.nutritionDetailModal tbody tr td:last-child:not(.left-align) {
+    text-align: right;
+}
+
+.nutritionDetailModal .border-up {
+    border-top: 2px solid #252519;
+    padding-top: 10px;
+}
+
+/* || Adjust screen size */
+@media screen and (max-width:384px) {
+
+    .calorie_diary_table {
+        border-spacing: 0.5em 1em;
+    }
+}
+
+
+@media screen and (max-width:430px) {
+    main {
+        font-size: smaller;
+    }
+
+    .nutrition_table {
+        padding: 0;
+        width: 90%;
+        max-width: 90%;
+        max-height: 90%;
+        overflow-x: hidden;
+    }
+
+    /* .calorie_diary_table {
+        width: 95%;
+        max-width: 95%;
+
+    } */
+
+    .nutrition--historytable tr td:nth-child(3),
+    .nutrition--historytable tr td:nth-child(4),
+    .nutrition--historytable tr td:nth-child(5) {
+        display: none;
+    }
+
+    .nutrition--historytable tr td:nth-child(6),
+    .nutrition--historytable tr td:nth-child(7) {
+        text-align: center;
+    }
+    
+    .addbag-cell .edit_amount_button {
+        width: 110px; 
+    }
+
+    .addbag-cell input,
+    .addbag-cell button {
+        width: 150px;
+    }
+
+    .recover-openbutton {
+        padding-left: 0;
+    }
+
+    .recover-openbutton:hover,
+    .recover-openbutton:focus {
+        padding-left: 0;
+    }
+}
+
+
+

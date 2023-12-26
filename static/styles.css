@@ -1,0 +1,230 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap');
+
+/* || CLEAN ALL ORIGINAL SETTING */
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    /* font-family: 'Nunito', sans-serif; */
+    font-family: 'Comfortaa', sans-serif;
+    color:#252519;
+
+}
+
+header {
+    height: 100px;
+    /* border: 1px solid orangered; */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+main {
+    height: 80vh;
+    background-image: url(../static/ezgif.com-crop.gif);
+    background-size:contain;
+    background-repeat: no-repeat;
+    background-position: top center;
+    background: none;
+    display: grid;
+    grid-template: repeat(2, 1fr) 100px repeat(2, 1fr) / repeat(6, 1fr);
+    justify-content: center;
+    align-items: center;
+}
+
+footer {
+    height: calc(20vh - 100px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* border: 1px solid red; */
+    background:linear-gradient(to right,
+    #e0eafc,#cfdef3);
+}
+
+/* || FONT CLASS */
+.font-bolder {
+    font-weight: 700;
+    font-size: 40px;
+}
+
+.nowrap {
+    white-space: nowrap;
+}
+
+.wrap {
+    white-space: wrap;
+}
+
+/* || ICE CREAM COLOR PALATTE */
+.icerose {
+    color:#6bb1ff;
+    /* color: #FD3765 ; */
+}
+
+.iceblue {
+    color:#6dcfff  ;
+}
+
+.iceyellow {
+    /* color: #ffe67c; */
+    color:#ffefc8;
+}
+
+.icepink {
+    color:#ffb163 ;
+}
+
+.icegreen {
+    color: #ffbf7f;
+}
+
+
+/* || SET LINK GENREAL DEALING */
+.link-nodecoration,
+.link-nodecoration:any-link {
+    text-decoration: none;
+    color: #252519;
+}
+
+
+/* || SET HEADER */
+
+/* SET logo */
+.header--logo {
+    padding-left: 1em;
+}
+
+/* SET NAV BAR */
+.nav-bar {
+    display: flex;
+    justify-content: space-between;
+}
+
+
+.nav-bar ul {
+   display: flex;
+}
+
+.nav-bar li {
+    list-style: none;
+    margin-right: 1em;
+}
+
+.nav-bar a,
+.nav-bar a:any-link,
+.nav-bar a:visited {
+    text-decoration: none;
+    color: #252519;
+    font-weight: bolder;
+}
+
+.nav-bar a:hover {
+    /* color:#ffa751; */
+    color:#ff8072;
+    font-size: larger;
+}
+
+
+.welcomeMenu--imagebox {
+    grid-area: 1/2/4/6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* align-items: center;
+    justify-content: center;
+    background-image: url(../static/ezgif.com-crop.gif);
+    background-size: auto;
+    background-repeat: no-repeat;
+    background-position: center center; */
+}
+
+.welcomeMenu--imagebox img {
+    max-width: 100%;
+    width: auto;
+    height: 100%;
+}
+
+/* || SET ASK BOX */
+.welcomeMenu {
+    grid-area: 4/2/6/6;
+    /* border: 1px double #FBC1AE; */
+    display: grid;
+    /* place-content: center; */
+    grid-template: repeat(2, 1fr) / repeat(2, 1fr);
+    gap: 1em;
+}
+
+.welcomeMenu h3 {
+    font-size: 30px;
+    text-align: center;
+    grid-area: 1/1/2/3;
+    
+}
+
+.welcomeMenu button {
+    height: 50px;
+    border-radius: 2rem;
+    /* background-color: rgb(255, 220, 227); */
+    
+    /* box-shadow: 5px 5px rgba(255, 225, 220, 0.407); */
+}
+
+
+.welcomeMenu a,
+.welcomeMenu a:any-link,
+.welcomeMenu a:visited {
+     /* text in the center */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 2rem;
+    text-decoration: none;
+    font-family: 'Comfortaa', sans-serif;
+    font-weight: bolder;
+    font-size: large;
+    color:#252519;
+}
+
+.welcomeMenu a:hover {
+    /* color:#ffa751; */
+    color:#ff8072;
+    background:linear-gradient(to right,
+    #e0eafc,
+#cfdef3);
+    /* background-color:#f8baba; */
+    font-size: 20px;
+}
+
+
+/* || Responsive Screen Adjustment */
+@media screen and (max-width: 430px) {
+    .welcomeMenu button {
+        display: none;
+    }
+
+    .header--logo h1 {
+        font-size: 1rem;
+    }
+
+    .header--logo {
+        padding-right: 1rem;
+    }
+
+}
+
+
+
+
+
+
+

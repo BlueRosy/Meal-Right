@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Search food</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link href="../static/favicon.ico" rel="icon">
+    <link rel='stylesheet' type='text/css' media='screen' href='../static/styles.css'>
+    <link rel='stylesheet' type='text/css' media='screen' href='../static/register.css'>
+    <link rel='stylesheet' type='text/css' media='screen' href='../static/error.css'>
+    <link rel='stylesheet' type='text/css' media='screen' href='../static/form.css'>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="../static/loading.js" type="text/JavaScript"></script>
+</head>
+<body>
+    <header>   
+        <!-- 左上角的标题 -->
+        <section class="header--logo">
+            <a href="/" class="link-nodecoration"><img src="../static/ezgif.com-gif-maker.gif" alt="hair boy" height="80" width="80">
+                <h1 class="nowrap">Meal Right</h1></a>
+        </section>
+        
+        <!-- 右上角的nav-bar -->
+        <nav class="nav-bar">
+            {% if session["user_id"] %}
+                <ul>
+                    <li><a href="/search">Add Food</a></li>
+                    <!-- current food bag, check whether user wants to add this food bag into its diary, user could either clear all or add some, or delete some food items -->
+                    <li><a href="/foodbag">Food Bag</a></li>
+                    
+                    <!-- user's food bag history -->
+                    <li><a href="/calorie_diary">Cal Diary</a></li>
+                </ul>
+                <ul>
+                    <li><a href="/logout">Log Out</a></li>
+                </ul>     
+            {% else %}
+                <ul>
+                    <li><a href="/register">Register</a></li>
+                    <li><a href="/login">Log In</a></li>
+                </ul>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main>
+        <form action="/search" method="post" class="no-border" id="content">
+            <h2 class="nowrap"><span class="icerose">S</span>earch <span class="iceblue">f</span>or <span class="iceyellow">y</span>our <span class="icepink">m</span>eal <span class="icegreen">!</span></h2>
+            <div class="item-center">
+                <img src="../static/main12.png" alt="search icon" class="image-block" width="100">
+            </div>
+            <div class="input-box-style item-center">
+                <input autocomplete="off" autofocus id="foodname" name="foodname" placeholder="Food name" type="text">
+            </div>
+            <button class="submit-button-style" type="submit" id="content-button">Search</button>
+        </form>
+        <div class="error-image-style" id="loading" style="display: none;">
+            <img src="../static/loading7.gif" alt="loading image" width="200">
+            <h2>Loading !</h2>
+        </div>
+    </main>
+
+    <footer>
+        <span class="nowrap">Copyright &copy; <time id="year"></time></span>
+        <span class="nowrap">Rose Design</span>
+    </footer>
+
+</body>
+</html>
+

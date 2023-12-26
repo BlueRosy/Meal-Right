@@ -1,0 +1,75 @@
+main {
+    background-image: none;
+}
+
+form {
+    grid-area: 2/3/5/5;
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    /* border: 1rem double rgba(25, 37, 26, 0.744);
+    border-radius: 4rem; */
+    padding: 1em;
+    min-width: 300px;
+    min-height: 500px;
+    /* gap: 1rem; */
+    
+}
+
+
+
+/* SETTING for SPECIAL form tag */
+.no-border {
+    border: 0;
+}
+
+
+/* SETTING for centering item */
+.item-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* SETTING for only search page image box */
+
+
+form input,
+.submit-button-style {
+    width: 250px;
+    height: 40px;
+    border-radius: 0.5em;
+    border: 0.1rem dotted #252519;
+    font-size: 100%;
+    text-align: center;
+    font-family: 'Comfortaa', sans-serif;
+}
+
+.submit-button-style {
+    width: 110px;
+    margin: 0 auto;
+    /* border: 1px solid #cfdef3; */
+    border:0;
+    font-weight: bold;
+}
+
+.submit-button-style:hover {
+    background-color:#f9d0be;
+    color:#ff8072;
+    font-weight: bolder;
+    font-size: large;
+    
+}
+
+
+/* || Responsive Screen Size Adjustment */
+@media screen and (max-width: 430px) {
+    form {
+        border: 0;
+    }
+}
+
+
+
+
+

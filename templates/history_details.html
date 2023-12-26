@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Food Consumption Details</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link href="../static/favicon.ico" rel="icon">
+    <link rel='stylesheet' type='text/css' media='screen' href='../static/styles.css'>
+    <link rel='stylesheet' type='text/css' media='screen' href='../static/home.css'>
+</head>
+<body>
+    <header>   
+        <!-- 左上角的标题 -->
+        <section class="header--logo">
+            <a href="/" class="link-nodecoration"><img src="../static/ezgif.com-gif-maker.gif" alt="hair boy" height="80" width="80">
+                <h1 class="nowrap">Meal Right</h1></a>
+        </section>
+        
+        <!-- 右上角的nav-bar -->
+        <nav class="nav-bar">
+            {% if session["user_id"] %}
+                <ul>
+                    <li><a href="/search">Add Food</a></li>
+                    <!-- current food bag, check whether user wants to add this food bag into its diary, user could either clear all or add some, or delete some food items -->
+                    <li><a href="/foodbag">Food Bag</a></li>
+                    
+                    <!-- user's food bag history -->
+                    <li><a href="/calorie_diary">Cal Diary</a></li>
+                </ul>
+                <ul>
+                    <li><a href="/logout">Log Out</a></li>
+                </ul>     
+            {% else %}
+                <ul>
+                    <li><a href="/register">Register</a></li>
+                    <li><a href="/login">Log In</a></li>
+                </ul>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main>
+        <!-- 中间的welcome page -->
+        <table class="nutrition_table">
+            <thead>
+                <tr>
+                    <td class="nutrition--header" colspan="4">
+                        <img src="../static/waiting4.png" alt="cute figure" height="150">
+                    </td>   
+                </tr>
+                <tr>
+                    <td colspan="2"><h2>Nutrition Facts</h2></td>
+                    <td colspan="2" class="checkDate-Style"><p>Date : {{checkDate}}</p></td>
+                </tr>
+                <tr class="nutrition--summaryStats">
+                    <td>Calories {{calories | kcal}}</td>
+                    <td>Fat {{fat | g }}</td>
+                    <td>Carbs {{carbs | g}}</td>
+                    <td>Protein {{protein | g}}</td>
+                </tr>
+            </thead>
+            <tbody class="nutrition--datatable"> 
+            {% if foodbag %}
+                <tr>
+                    <td>Foodbag item</td>
+                    <td>Serving size(g)</td>
+                    <td>Calories (kcal)</td>
+                    <td>% Daily Calorie Value</td>
+                </tr>
+                {% for food in foodbag %}
+                    <tr>
+                        <td>
+                            <button type="button" class="recover-openbutton">{{food["food"]}}</button>
+                            <dialog class="recoverFoodModal">
+                                <form action="/item-recover" method="post">
+                                    <h2>{{food["food"]}}</h2>
+                                    <input type="hidden" name="recover_fdcId" value="{{food['fdcId']}}">
+                                    <input autocomplete="off" autofocus type="number" min="1" name="recover_amount" placeholder="recover amount">
+                                    <div class="dialog--buttons">
+                                        <button type="submit">recover</button>
+                                        <button type="button" class="recover-closebutton">cancel</button>
+                                    </div>
+                                    <p class="hintfooter">note: recovering item will put your selected amount back into your foodbag</p>
+                                </form>
+                            </dialog>
+                        </td>
+                        <td>&times; {{food["servings"]}}g</td>
+                        <td>{{food["calories"] | kcal}}</td>
+                        <td>{{(food["calories"] / calories) | percentage }}</td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+            </tbody> 
+            <tfoot>
+                {% if not foodbag %}
+                <tr>
+                    <td colspan="3">you haven't consume anything at this date !</td>
+                    <td>
+                        <button type="button" class="no-padding-button"><a class="link-nodecoration" href="/calorie_diary">Back to Cal Diary</a></button>
+                    </td>
+                </tr>
+                {% else %}
+                <tr ><td colspan="4" class="nutrition--footer">A nutrition snapshot of your history food bag !</td></tr>
+                <tr>
+                    <td colspan="4" id="button-box">
+                        <form action="/history_recover" method="post" id="remove-all-form">
+                            <button type="submit" name="recover_date" value="{{checkDate}}">Put back to foodbag
+                            </button>
+                        </form>
+                        <button type="button" class="no-padding-button"><a href="/calorie_diary" class="link-nodecoration">Back to Cal Diary</a></button>
+                    </td> 
+                </tr>
+                {% endif %}
+            </tfoot>
+        </table>
+    </main>
+    <footer>
+        <span class="nowrap">Copyright &copy; <time id="year"></time></span>
+        <span class="nowrap">Rose Design</span>
+    </footer>
+    <script>
+        var openModal = document.querySelectorAll('.recover-openbutton')
+        var recoverModal = document.querySelectorAll('.recoverFoodModal')
+        var closeModal = document.querySelectorAll('.recover-closebutton')
+
+        for (let i = 0; i < openModal.length; i++) {
+            openModal[i].addEventListener('click', function(event){
+                recoverModal[i].showModal();
+            })
+        }
+
+        for (let i = 0; i < closeModal.length; i++) {
+            closeModal[i].addEventListener('click', function(event){
+                recoverModal[i].close();
+            })
+        }
+
+    </script>
+</body>
+</html>
+

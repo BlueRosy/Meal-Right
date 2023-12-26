@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Search {{searchkey}} results</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link href="../static/favicon.ico" rel="icon">
+    <link rel='stylesheet' type='text/css' media='screen' href='../static/styles.css'>
+    <link rel='stylesheet' type='text/css' media='screen' href='../static/home.css'>
+    
+</head>
+<body>
+    <header>   
+        <!-- 左上角的标题 -->
+        <section class="header--logo">
+            <a href="/" class="link-nodecoration"><img src="../static/ezgif.com-gif-maker.gif" alt="hair boy" height="80" width="80">
+                <h1 class="nowrap">Meal Right</h1></a>
+        </section>
+        
+        <!-- 右上角的nav-bar -->
+        <nav class="nav-bar">
+            {% if session["user_id"] %}
+                <ul>
+                    <li><a href="/search">Add Food</a></li>
+                    <!-- current food bag, check whether user wants to add this food bag into its diary, user could either clear all or add some, or delete some food items -->
+                    <li><a href="/foodbag">Food Bag</a></li>
+                    
+                    <!-- user's food bag history -->
+                    <li><a href="/calorie_diary">Cal Diary</a></li>
+                </ul>
+                <ul>
+                    <li><a href="/logout">Log Out</a></li>
+                </ul>     
+            {% else %}
+                <ul>
+                    <li><a href="/register">Register</a></li>
+                    <li><a href="/login">Log In</a></li>
+                </ul>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main>
+        <!-- 中间的search results -->
+        <table class="nutrition_table">
+            <thead>
+                <tr>
+                    <td class="nutrition--header" colspan="2">
+                        <img src="../static/cooking.png" alt="cute figure" height="150">
+                    </td>   
+                </tr>
+                <tr>
+                    <td class="nutrition--title" colspan="2"><h2>Select a Food</h2></td>
+                </tr>
+            </thead>
+            <tbody> 
+            {% if res %} 
+                <!-- <tr>
+                    <td>Food Description</td>
+                </tr> -->
+                {% for food in res %}
+                    <tr>
+                        <td>
+                            <button type="button" class="open-button">
+                                {{ food.get('description') }}
+                            <br>
+                                {{ food.get('foodNutrients') | getCalorie }}kcal / 100g
+                            </button>
+                            <dialog class="nutritionDetailModal">
+                                <button type="button" class="close-button">&times;</button>
+                                <table class="nutrition_table">
+                                    <thead>
+                                        <tr>
+                                            <td colspan="3">
+                                                <h2>{{food.get('description')}}
+                                                </h2>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3">
+                                                <h3>{{food.get('foodCategory')}}
+                                                </h3>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3" class="border-up">
+                                                <h3>Nutrition Analysis ( per 100g )
+                                                </h3>
+                                            </td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="2">
+                                                Energy
+                                            </td>
+                                            <td>
+                                                {{food.get('foodNutrients') | getCalorie}}kcal
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">
+                                                Protein
+                                            </td>
+                                            <td>
+                                                {{food.get('foodNutrients') | getProtein}}g
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">
+                                                Total lipid (fat)
+                                            </td>
+                                            <td>
+                                                {{food.get('foodNutrients') | getFat}}g
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">
+                                                Carbohydrate, by difference
+                                            </td>
+                                            <td>
+                                                {{food.get('foodNutrients') | getCarbs}}g
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+
+                                            </td>
+                                            <td>
+                                                Sugar, total
+                                            </td>
+                                            <td>
+                                                {{food.get('foodNutrients') | getSugar}}g
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>
+                                                Fiber, total dietary
+                                            </td>
+                                            <td>
+                                                {{food.get('foodNutrients') | getFiber}}g
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">
+                                                Water
+                                            </td>
+                                            <td>
+                                                {{food.get('foodNutrients') | getWater}}g
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3" class="left-align">
+                                                Minerals
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>
+                                                Calcium, Ca
+                                            </td>
+                                            <td>
+                                                {{food.get('foodNutrients') | getCa}}mg
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>
+                                                Iron, Fe
+                                            </td>
+                                            <td>
+                                                {{food.get('foodNutrients') | getFe}}mg
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>
+                                                Magnesium, Mg
+                                            </td>
+                                            <td>
+                                                {{food.get('foodNutrients') | getMg}}mg
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>
+                                                Phosphorus, P
+                                            </td>
+                                            <td>
+                                                {{food.get('foodNutrients') | getP}}mg
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>
+                                                Potassium, K
+                                            </td>
+                                            <td>
+                                                {{food.get('foodNutrients') | getK}}mg
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>
+                                                Sodium, Na
+                                            </td>
+                                            <td>
+                                                {{food.get('foodNutrients') | getNa}}mg
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>
+                                                Zinc, Zn
+                                            </td>
+                                            <td>
+                                                {{food.get('foodNutrients') | getZn}}mg
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>
+                                                Copper, Cu
+                                            </td>
+                                            <td>
+                                                {{food.get('foodNutrients') | getCu}}mg
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>
+                                                Selenium, Se
+                                            </td>
+                                            <td>
+                                                {{food.get('foodNutrients') | getSe}}µg
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3" class="left-align">
+                                                Vitamin
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>
+                                                Vitamin A
+                                            </td>
+                                            <td>
+                                                {{food.get('foodNutrients') | getVitaminA}}µg
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>
+                                                Retinol (Vitamin A1)
+                                            </td>
+                                            <td>
+                                                {{food.get('foodNutrients') | getVitaminA1}}µg
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>
+                                                Vitamin B-6
+                                            </td>
+                                            <td>
+                                                {{food.get('foodNutrients') | getVitaminB6}}mg
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>
+                                                Vitamin B-12
+                                            </td>
+                                            <td>
+                                                {{food.get('foodNutrients') | getVitaminB12}}µg
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>
+                                                Vitamin C
+                                            </td>
+                                            <td>
+                                                {{food.get('foodNutrients') | getVitaminC}}mg
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>
+                                                Vitamin D (D2 + D3)
+                                            </td>
+                                            <td>
+                                                {{food.get('foodNutrients') | getVitaminD}}µg
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>
+                                                Vitamin E
+                                            </td>
+                                            <td>
+                                                {{food.get('foodNutrients') | getVitaminE}}mg
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>
+                                                Vitamin K
+                                            </td>
+                                            <td>
+                                                {{food.get('foodNutrients') | getVitaminK}}µg
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">
+                                                Fatty acids, total saturated
+                                            </td>
+                                            <td>
+                                                {{food.get('foodNutrients') | getFattedAcidSaturated}}g
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">
+                                                Fatty acids, total monounsaturated
+                                            </td>
+                                            <td>
+                                                {{food.get('foodNutrients') | getFattyAcidMonounsaturated}}g
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">
+                                                Fatty acids, total polyunsaturated
+                                            </td>
+                                            <td>
+                                                {{food.get('foodNutrients') | getFattyAcidPolyunsaturated}}g
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </dialog>
+                        </td>   
+                        <!-- <td>{{ food.get('foodNutrients') | getProtein }}</td>
+                        <td>{{ food.get('foodNutrients') | getFat }}</td>
+                        <td>{{ food.get('foodNutrients') | getCarbs }}</td>
+                        <td>{{ food.get('foodNutrients') | getCalorie }}</td> -->
+                        <td class="addbag-cell"><form action="/addbagsuccess" method="post">
+                            <input type="hidden" id="fdcId" name="fdcId" value="{{ food.get('fdcId') }}">
+                            <input type="hidden" id="item" name="item" value="{{ food.get('description') }}">
+                            <input type="number" id="servingSizeUnit" name="servingSizeUnit" min="1" placeholder="consumption(g)">
+                            <input type="hidden" id="protein" name="protein" value="{{ food.get('foodNutrients') | getProtein }}" >
+                            <input type="hidden" id="fat" name="fat" value="{{ food.get('foodNutrients') | getFat }}">
+                            <input type="hidden" id="carbs" name="carbs" value="{{ food.get('foodNutrients') | getCarbs }}">
+                            <input type="hidden" id="calorie" name="calorie" value="{{ food.get('foodNutrients') | getCalorie }}">
+                            <button type="submit">add into foodbag</button>
+                        </form></td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+            </tbody> 
+            <tfoot>
+                {% if not res %}
+                <tr>
+                    <td colspan="2">www~~ nothing has been found. we will add more contents soon !</td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <button><a class="link-nodecoration" href="/search">search again</a></button>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="2">dear! this is your search results. Lalala~~~</td>
+                </tr>
+                {% endif %}
+            </tfoot>
+        </table>
+    </main>
+    <footer>
+        <span class="nowrap">Copyright &copy; <time id="year"></time></span>
+        <span class="nowrap">Rose Design</span>
+    </footer>
+    <script>
+        var openModal = document.querySelectorAll('.open-button')
+        var modal = document.querySelectorAll('.nutritionDetailModal')
+        var closeModal = document.querySelectorAll('.close-button')
+
+        for (let i = 0; i < openModal.length; i++) {
+            openModal[i].addEventListener('click', function(event) {
+                modal[i].showModal();
+            })
+        }
+
+        for (let i = 0; i < closeModal.length; i++) {
+            closeModal[i].addEventListener('click', function(event) {
+                modal[i].close();
+            })
+        }
+
+    </script>
+</body>
+</html>
