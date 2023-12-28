@@ -71,11 +71,11 @@
                 {% for food in foodbag %}
                     <tr>
                         <td>
-                            <button type="button" class="recover-openbutton">{{food["food"]}}</button>
+                            <button type="button" class="recover-openbutton">{{food.get("food")}}</button>
                             <dialog class="recoverFoodModal">
                                 <form action="/item-recover" method="post">
-                                    <h2>{{food["food"]}}</h2>
-                                    <input type="hidden" name="recover_fdcId" value="{{food['fdcId']}}">
+                                    <h2>{{food.get("food")}}</h2>
+                                    <input type="hidden" name="recover_fdcId" value="{{food.get('fdcId')}}">
                                     <input autocomplete="off" autofocus type="number" min="1" name="recover_amount" placeholder="recover amount">
                                     <div class="dialog--buttons">
                                         <button type="submit">recover</button>
@@ -85,9 +85,9 @@
                                 </form>
                             </dialog>
                         </td>
-                        <td>&times; {{food["servings"]}}g</td>
-                        <td>{{food["calories"] | kcal}}</td>
-                        <td>{{(food["calories"] / calories) | percentage }}</td>
+                        <td>&times; {{food.get("servings")}}g</td>
+                        <td>{{food.get("calories") | kcal}}</td>
+                        <td>{{(food.get("calories") / calories) | percentage }}</td>
                     </tr>
                 {% endfor %}
             {% endif %}

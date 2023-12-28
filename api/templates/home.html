@@ -70,10 +70,10 @@
                 </tr>
                 {% for food in foodbag %}
                     <tr>
-                        <td>{{food["food"]}}</td>
-                        <td>&times; {{food["servings"]}}g</td>
-                        <td>{{food["calories"] | kcal}}</td>
-                        <td>{{(food["calories"] / calories) | percentage }}</td>
+                        <td>{{food.get("food")}}</td>
+                        <td>&times; {{food.get("servings")}}g</td>
+                        <td>{{food.get("calories") | kcal}}</td>
+                        <td>{{(food.get("calories") / calories) | percentage }}</td>
                     </tr>
                 {% endfor %}
             {% endif %}

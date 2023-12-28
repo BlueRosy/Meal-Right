@@ -64,11 +64,11 @@
                 </tr>
                 {% for history in histories %}
                     <tr>
-                        <td>{{history['date']}}</td>
-                        <td>{{history['calories'] | kcal}}</td>
-                        <td>{{history['fat'] | g}}</td>
-                        <td>{{history['carbs'] | g}}</td>
-                        <td>{{history['protein'] | g}}</td>
+                        <td>{{history.get('date')}}</td>
+                        <td>{{history.get('calories') | kcal}}</td>
+                        <td>{{history.get('fat') | g}}</td>
+                        <td>{{history.get('carbs') | g}}</td>
+                        <td>{{history.get('protein') | g}}</td>
                         <td>
                             <form action="/historyDetails" method="post">
                                 <button type="submit" value="{{history['date']}}" name="checkDate">
@@ -78,7 +78,7 @@
                         </td>
                         <td>
                             <form action="/delete_diary" method="post">
-                                <button type="submit" value="{{history['date']}}" name="deleteDate">
+                                <button type="submit" value="{{history.get('date')}}" name="deleteDate">
                                     delete record
                                 </button>
                             </form>      

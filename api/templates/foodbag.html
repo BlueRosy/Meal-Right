@@ -63,19 +63,19 @@
                 </tr>
                 {% for food in foodbag %}
                     <tr>
-                        <td>{{food["food"]}}</td>
+                        <td>{{food.get("food")}}</td>
                         <!-- <td><input type="number" value="{{food['servings']}}" style="width: 60px; height:40px; border: 1px dotted #84b7ff; border-radius:0.5rem; text-align:center; font-family: 'Comfortaa', sans-serif;"></td> -->
-                        <td>&times;{{food['servings']}}g</td>
+                        <td>&times;{{food.get('servings')}}g</td>
                         <td class="addbag-cell">
                                 <!-- <input type="hidden" name="fdcId" value="{{food['fdcId']}}">
                                 <input type="number" id="remove_amount" name="remove_amount" placeholder="remove amount(g)" min="1"> -->
                                 <button type="button" class="edit_amount_button">edit amount</button>
                                 <dialog class="modal">
                                     <form action="/foodbag" method="post">
-                                        <h2>{{food["food"]}}</h2>
-                                        <p>Current serving size: {{food["servings"]}}g</p>
+                                        <h2>{{food.get("food")}}</h2>
+                                        <p>Current serving size: {{food.get("servings")}}g</p>
                                         <input type="number" name="new_serving_size" placeholder="new serving size(g)" min="0" autofocus autocomplete="off">
-                                        <input type="hidden" name="fdcId" value="{{food['fdcId']}}">
+                                        <input type="hidden" name="fdcId" value="{{food.get('fdcId')}}">
                                         <div class="dialog--buttons">
                                             <button type="submit" name="submit-button"
                                             class="submit-button"  value="modify">modify</button>

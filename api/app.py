@@ -2,10 +2,13 @@ import os
 import sys
 
 from cs50 import SQL
+import psycopg2
+import psycopg2.extras
 import datetime
-from datetime import date
+from datetime import date, timedelta
 import pytz
 from flask import Flask, flash, redirect, render_template, request, session
+# from flask_sqlalchemy import SQLAlchemy
 from urllib.error import URLError, HTTPError
 from requests.exceptions import RequestException
 from flask_session import Session
@@ -51,11 +54,30 @@ app.jinja_env.filters["getFattyAcidPolyunsaturated"] = getFattyAcidPolyunsaturat
 
 # Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_TYPE"] = "filesystem"
-Session(app)
+app.config["SECRET_KEY"] = 'mySecret'
+app.config['PERMANENT_SESSION_LIFETIME'] =  timedelta(minutes=30)
+# app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://default:xOYnls4XI2ub@ep-withered-lake-46572808-pooler.us-east-1.postgres.vercel-storage.com/verceldb"
+# app.config["SESSION_TYPE"] = "sqlalchemy"
+# db = SQLAlchemy(app)
+# app.config["SESSION_SQLALCHEMY"] = db
 
-# Configure SQLite database
-db = SQL("sqlite:///food.db")
+# db.create_all()
+
+# Session(app)
+
+# Configure postgres database
+# connect to the db
+connect = psycopg2.connect(
+    host = "ep-withered-lake-46572808-pooler.us-east-1.postgres.vercel-storage.com",
+    database = "verceldb",
+    user = "default",
+    password = "xOYnls4XI2ub",
+    port="5432"
+    
+)
+
+# postgres db cursor
+cursor = connect.cursor(cursor_factory = psycopg2.extras.RealDictCursor)
 
 
 @app.after_request
@@ -95,16 +117,19 @@ def register():
         name = request.form.get("username")
         p1 = request.form.get("password")
         p2 = request.form.get("confirmation")
-        rows = db.execute("SELECT COUNT(*) as counts FROM users WHERE name = ?", name)
+        cursor.execute('SELECT COUNT(*) as "counts" FROM users WHERE "name" = %s', (name,))
+        rows = cursor.fetchall()
         if rows[0]["counts"] > 0:
             return error("Dear, username has been used!", 400)
         
         # store the valid username and password into db
-        db.execute("INSERT INTO users (name, hash)VALUES (?, ?)", name, generate_password_hash(p1))
+        cursor.execute('INSERT INTO users (name, hash) VALUES (%s, %s);', (name, generate_password_hash(p1)))
+        connect.commit()
         
         
         # store user in the session
-        row = db.execute("SELECT id FROM users WHERE name = ?", name)
+        cursor.execute("SELECT id FROM users WHERE name = %s;", (name,))
+        row = cursor.fetchall()
         session["user_id"] = row[0]["id"]
         
         return redirect("/home")
@@ -129,7 +154,8 @@ def login():
             return error("Dear, we don't receive your password !", 403)
         
         # check if username exists in db
-        row = db.execute("SELECT * FROM users WHERE name = ?", name)
+        cursor.execute("SELECT * FROM users WHERE name = %s", (name,))
+        row = cursor.fetchall()
         if len(row) == 0:
             return error("Dear, you seem unregistered yet !", 403)
         
@@ -151,10 +177,15 @@ def home():
     
     # get total summary for current food bag
     ## note: calorie = calc per serving * servings, fat, carb and protein too
-    res = db.execute("SELECT IFNULL(SUM(calorie_100g * servingSize / 100), 0) as calories, IFNULL(SUM(fat_100g * servingSize / 100), 0) as fat, IFNULL(SUM(carbs_100g * servingSize / 100), 0) as carbs, IFNULL(SUM(protein_100g * servingSize / 100), 0) as protein FROM foodbag WHERE user_id = ?", user_id)
+    cursor.execute(
+        'SELECT COALESCE(SUM("calorie_100g" * "servingSize" / 100), 0) as calories, COALESCE(SUM("fat_100g" * "servingSize" / 100), 0) as fat, COALESCE(SUM("carbs_100g" * "servingSize" / 100), 0) as carbs, COALESCE(SUM("protein_100g" * "servingSize" / 100), 0) as protein FROM foodbag WHERE user_id = %s', (str(user_id),))
+    
+    res = cursor.fetchall()
     
     # get information about single items inside the food bag
-    foodbag = db.execute("SELECT food, IFNULL(SUM(servingSize), 0) as servings, IFNULL(SUM(calorie_100g * servingSize / 100), 0) as calories FROM foodbag WHERE user_id = ? GROUP BY(food) ORDER BY 3 DESC;", user_id)
+    cursor.execute('SELECT food, COALESCE(SUM("servingSize"), 0) as servings, COALESCE(SUM("calorie_100g" * "servingSize" / 100), 0) as calories FROM foodbag WHERE user_id = %s GROUP BY(food) ORDER BY 3 DESC;', (str(user_id), ))
+    
+    foodbag = cursor.fetchall()
     
     return render_template("home.html", 
                            calories=res[0]["calories"],
@@ -229,14 +260,21 @@ def add_item():
             return error("Dear, data input is not positive !", 403)
     
     # check if fdcId has already in the foodbag
-    records = db.execute("SELECT IFNULL(COUNT(*), 0) as counts FROM foodbag WHERE user_id = ? and fdcId = ?", session["user_id"], fdcId)
+    cursor.execute(
+        'SELECT COALESCE(COUNT(*), 0) as counts FROM foodbag WHERE user_id = %s and "fdcId" = %s', (str(session["user_id"]), fdcId))
+    
+    records = cursor.fetchall()
     
     if records[0]["counts"] > 0:
-        db.execute("UPDATE foodbag SET servingSize = servingSize + ? WHERE user_id = ? and fdcId = ?;", servingSizeUnit, session["user_id"], fdcId)
+        cursor.execute('UPDATE foodbag SET "servingSize" = "servingSize" + %s WHERE user_id = %s and "fdcId" = %s;', (servingSizeUnit, str(session["user_id"]), fdcId))
+        
+        connect.commit()
         
     # insert all info into current food bags
     else: 
-        db.execute("INSERT INTO foodbag (user_id, fdcId, food, servingSize, protein_100g, fat_100g, carbs_100g, calorie_100g) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", session["user_id"], fdcId, item, servingSizeUnit, protein, fat, carbs, calorie)
+        cursor.execute('INSERT INTO foodbag (user_id, "fdcId", food, "servingSize", "protein_100g", "fat_100g", "carbs_100g", "calorie_100g") VALUES (%s, %s, %s, %s, %s, %s, %s, %s)', (str(session["user_id"]), fdcId, item, servingSizeUnit, protein, fat, carbs, calorie))
+        
+        connect.commit()
     
     return success("food has been successfully added into your bag !")
 
@@ -262,7 +300,8 @@ def foodbag():
             else:
                 if remove == 1:
                     # remove all user's foodbag item
-                    db.execute("DELETE FROM foodbag WHERE user_id = ?;", session["user_id"])
+                    cursor.execute("DELETE FROM foodbag WHERE user_id = %s;", (str(session["user_id"]), ))
+                    connect.commit()
                     return success("your foodbag is now empty !")
                 else:
                     return error("dear, it seems an invalid operation !", 403) 
@@ -283,21 +322,27 @@ def foodbag():
                 return error("dear, you inputed a nagative amount !", 403)
         
         # verify if the fdcId in the foodbag
-        records = db.execute("SELECT IFNULL(count(*), 0) as counts FROM foodbag WHERE user_id = ? and fdcId = ?", session["user_id"], fdcId)
+        cursor.execute('SELECT COALESCE(count(*), 0) as counts FROM foodbag WHERE user_id = %s and "fdcId" = %s', (str(session["user_id"]), fdcId ))
+        
+        records = cursor.fetchall()
         
         if records[0]["counts"] == 0:
             return error("dear, your foodbag doesn't contain this item !", 403)
         
         # delete the whole item from database
         if update == 0:
-            db.execute("DELETE FROM foodbag WHERE user_id = ? and fdcId = ?;", session["user_id"], fdcId)
+            cursor.execute('DELETE FROM foodbag WHERE user_id = %s and "fdcId" = %s;', (str(session["user_id"]), fdcId))
+            connect.commit()
             return success("item has been removed from your foodbag !")
         # update the item amount in the database
         else:
-            db.execute("UPDATE foodbag SET servingSize = ? WHERE user_id = ? and fdcId = ?;", update, session["user_id"], fdcId)
+            cursor.execute('UPDATE foodbag SET "servingSize" = %s WHERE user_id = %s and "fdcId" = %s;', (update, str(session["user_id"]), fdcId))
+            connect.commit()
             return success("item amount has been updated in your foodbag !")
                   
-    foodbag = db.execute("SELECT fdcId, food, IFNULL(SUM(servingSize), 0) as servings FROM foodbag WHERE user_id = ? GROUP BY fdcId, food ORDER BY id DESC;", session["user_id"])
+    cursor.execute('SELECT "fdcId", food, COALESCE(SUM("servingSize"), 0) as servings FROM foodbag WHERE user_id = %s GROUP BY "fdcId", food ORDER BY food;', (str(session["user_id"]), ))
+    
+    foodbag = cursor.fetchall()
     
     return render_template("foodbag.html", foodbag=foodbag)
                 
@@ -322,16 +367,23 @@ def diary():
             return error("dear! you inputed an invalid date !", 403)
         
         # validate if certain date diary has already saved.
-        records = db.execute("SELECT IFNULL(COUNT(*), 0) as counts FROM diaries WHERE user_id = ? AND date = ?", session["user_id"], diary_date)
+        cursor.execute("SELECT COALESCE(COUNT(*), 0) as counts FROM diaries WHERE user_id = %s AND date = %s", (str(session["user_id"]), diary_date))
+        
+        records = cursor.fetchall()
         
         if records[0]["counts"] > 0:
             return error("dear! you already have this date's diary ! please delete it first !", 403)
         
         # put foodbag data in diary catelog
-        db.execute("INSERT INTO diaries (user_id, date, food, fdcId, protein_100g, fat_100g, carbs_100g, calorie_100g, servingSize) SELECT user_id, ?, food, fdcId, protein_100g, fat_100g, carbs_100g, calorie_100g, servingSize FROM foodbag WHERE user_id = ?", diary_date, session["user_id"])
+        cursor.execute('INSERT INTO diaries (user_id, date, food, "fdcId", "protein_100g", "fat_100g", "carbs_100g", "calorie_100g", "servingSize") SELECT user_id, %s, food, "fdcId", "protein_100g", "fat_100g", "carbs_100g", "calorie_100g", "servingSize" FROM foodbag WHERE user_id = %s', (diary_date, str(session["user_id"])))
+        
+        connect.commit()
+        
         return success("you have successfully recorded your foodbag snapshot in your cal diary !")
     
-    histories = db.execute("SELECT date, IFNULL(SUM(calorie_100g * servingSize / 100), 0) as calories, IFNULL(SUM(fat_100g * servingSize / 100), 0) as fat, IFNULL(SUM(carbs_100g * servingSize / 100), 0) as carbs, IFNULL(SUM(protein_100g * servingSize / 100), 0) as protein FROM diaries WHERE user_id = ? GROUP BY date ORDER BY date DESC;", session["user_id"]) 
+    cursor.execute('SELECT date, COALESCE(SUM("calorie_100g" * "servingSize" / 100), 0) as calories, COALESCE(SUM("fat_100g" * "servingSize" / 100), 0) as fat, COALESCE(SUM("carbs_100g" * "servingSize" / 100), 0) as carbs, COALESCE(SUM("protein_100g" * "servingSize" / 100), 0) as protein FROM diaries WHERE user_id = %s GROUP BY date ORDER BY date DESC;', (str(session["user_id"]), ))
+    
+    histories = cursor.fetchall() 
     return render_template('calorie_diary.html', histories=histories)
 
 @app.route("/delete_diary", methods=["POST"])      
@@ -352,12 +404,16 @@ def delete_diary():
         return error("dear! you specified an invalid date !", 403)
     
     # check if the date information appeared in user diary
-    records = db.execute("SELECT IFNULL(COUNT(*), 0) as counts FROM diaries WHERE user_id = ? AND date = ?", session["user_id"], delete_date)
+    cursor.execute("SELECT COALESCE(COUNT(*), 0) as counts FROM diaries WHERE user_id = %s AND date = %s", (str(session["user_id"]), delete_date))
+    
+    records = cursor.fetchall()
     
     if records[0]["counts"] == 0:
         return error("dear! you don't have this date's diary !", 403)
     
-    db.execute("DELETE FROM diaries WHERE user_id = ? AND date = ?", session["user_id"], delete_date)
+    cursor.execute("DELETE FROM diaries WHERE user_id = %s AND date = %s", (str(session["user_id"]), delete_date))
+    
+    connect.commit()
     
     return success("diary record for this specific date has been deleted !")
 
@@ -379,16 +435,22 @@ def historyDetails():
         return error("dear! you specified an invalid date !", 403)
     
     # check if the date information appeared in user diary
-    records = db.execute("SELECT IFNULL(COUNT(*), 0) as counts FROM diaries WHERE user_id = ? AND date = ?", session["user_id"], checkDate)
+    cursor.execute("SELECT COALESCE(COUNT(*), 0) as counts FROM diaries WHERE user_id = %s AND date = %s", (str(session["user_id"]), checkDate))
+    
+    records = cursor.fetchall()
     
     if records[0]["counts"] == 0:
         return error("dear! you don't have this date's food consumption details !", 403)
     
     # show results on the webpage
-    res = db.execute("SELECT IFNULL(SUM(calorie_100g * servingSize / 100), 0) as calories, IFNULL(SUM(fat_100g * servingSize / 100), 0) as fat, IFNULL(SUM(carbs_100g * servingSize / 100), 0) as carbs, IFNULL(SUM(protein_100g * servingSize / 100), 0) as protein FROM diaries WHERE user_id = ? AND date = ?", session["user_id"], checkDate)
+    cursor.execute('SELECT COALESCE(SUM("calorie_100g" * "servingSize" / 100), 0) as calories, COALESCE(SUM("fat_100g" * "servingSize" / 100), 0) as fat, COALESCE(SUM("carbs_100g" * "servingSize" / 100), 0) as carbs, COALESCE(SUM("protein_100g" * "servingSize" / 100), 0) as protein FROM diaries WHERE user_id = %s AND date = %s', (str(session["user_id"]), checkDate))
+    
+    res = cursor.fetchall()
     
     # get information about single items inside the food bag
-    foodbag = db.execute("SELECT fdcId, food, IFNULL(SUM(servingSize), 0) as servings, IFNULL(SUM(calorie_100g * servingSize / 100), 0) as calories FROM diaries WHERE user_id = ? AND date = ? GROUP BY fdcId, food ORDER BY 4 DESC;", session["user_id"], checkDate)
+    cursor.execute('SELECT "fdcId", food, COALESCE(SUM("servingSize"), 0) as servings, COALESCE(SUM("calorie_100g" * "servingSize" / 100), 0) as calories FROM diaries WHERE user_id = %s AND date = %s GROUP BY "fdcId", food ORDER BY 4 DESC;', (str(session["user_id"]), checkDate))
+    
+    foodbag = cursor.fetchall()
     
     return render_template("history_details.html", 
                            checkDate=checkDate,
@@ -417,16 +479,22 @@ def historyRecover():
         return error("dear! you specified an invalid date !", 403)
     
     # check if the date information appeared in user diary
-    records = db.execute("SELECT IFNULL(COUNT(*), 0) as counts FROM diaries WHERE user_id = ? AND date = ?", session["user_id"], recover_date)
+    cursor.execute("SELECT COALESCE(COUNT(*), 0) as counts FROM diaries WHERE user_id = %s AND date = %s", (str(session["user_id"]), recover_date))
+    
+    records = cursor.fetchall()
     
     if records[0]["counts"] == 0:
         return error("dear! you don't record your consumption at this date !", 403)
     
     # recover results into foodbag, note: sqlite3 syntax 
     # still note: if item has already in the foodbag, must update rather than insert
-    db.execute("DELETE FROM foodbag WHERE user_id = ? AND fdcId IN (SELECT DISTINCT(fdcId) FROM diaries WHERE user_id = ? AND date = ?);", session["user_id"], session["user_id"], recover_date)
+    cursor.execute('DELETE FROM foodbag WHERE user_id = %s AND "fdcId" IN (SELECT DISTINCT("fdcId") FROM diaries WHERE user_id = %s AND date = %s);', (str(session["user_id"]), str(session["user_id"]), recover_date))
+    
+    connect.commit()
 
-    db.execute("INSERT INTO foodbag (user_id, food, fdcId, protein_100g, fat_100g, carbs_100g, calorie_100g, servingSize) SELECT user_id, food, fdcId, protein_100g, fat_100g, carbs_100g, calorie_100g, servingSize FROM diaries WHERE user_id = ? AND date = ?;", session["user_id"], recover_date)
+    cursor.execute('INSERT INTO foodbag (user_id, food, "fdcId", "protein_100g", "fat_100g", "carbs_100g", "calorie_100g", "servingSize") SELECT user_id, food, "fdcId", "protein_100g", "fat_100g", "carbs_100g", "calorie_100g", "servingSize" FROM diaries WHERE user_id = %s AND date = %s;', (str(session["user_id"]), recover_date))
+    
+    connect.commit()
     
     return success("historical consumption has been recovered in your foodbag !")
 
@@ -455,19 +523,25 @@ def itemRecover():
             return error("dear! you need to specify a positive amount to recover.", 403)
     
     # test if the item contain in the diary 
-    records = db.execute("SELECT IFNULL(COUNT(*), 0) as counts FROM diaries WHERE user_id = ? AND fdcId = ?;", session['user_id'], fdcId)
+    cursor.execute('SELECT COALESCE(COUNT(*), 0) as counts FROM diaries WHERE user_id = %s AND "fdcId" = %s;', (str(session['user_id']), fdcId))
+    
+    records = cursor.fetchall()
     
     if records[0]['counts'] <= 0:
         return error("dear! your diary doesn't contain this item!", 403)
     
     # test if item already contain in the foodbag
-    records = db.execute("SELECT IFNULL(COUNT(*), 0) as counts FROM foodbag WHERE user_id = ? AND fdcId = ?;", session["user_id"], fdcId)
+    cursor.execute('SELECT COALESCE(COUNT(*), 0) as counts FROM foodbag WHERE user_id = %s AND "fdcId" = %s;', (str(session["user_id"]), fdcId))
+    
+    records = cursor.fetchall()
     
     if records[0]['counts'] > 0:
         return error("dear! your foodbag already contains this item. please directly edit it there", 403)
     
     # recover item and amount to foodbag
-    db.execute("INSERT INTO foodbag (user_id, food, fdcId, protein_100g, fat_100g, carbs_100g, calorie_100g, servingSize) SELECT user_id, food, fdcId, protein_100g, fat_100g, carbs_100g, calorie_100g, ? FROM diaries WHERE user_id = ? AND fdcId = ? LIMIT 1;", amount, session["user_id"], fdcId)
+    cursor.execute('INSERT INTO foodbag (user_id, food, "fdcId", "protein_100g", "fat_100g", "carbs_100g", "calorie_100g", "servingSize") SELECT user_id, food, "fdcId", "protein_100g", "fat_100g", "carbs_100g", "calorie_100g", %s FROM diaries WHERE user_id = %s AND "fdcId" = %s LIMIT 1;', (amount, str(session["user_id"]), fdcId))
+    
+    connect.commit()
     
     return success("item has been added into your foodbag !")
     
