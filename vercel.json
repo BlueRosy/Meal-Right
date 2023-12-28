@@ -10,12 +10,6 @@
             "src":"/(.*)",
             "dest":"api/app.py"
         }
-    ],
-
-    "functions": {
-        "food_nurition/api/**/*": {
-        "maxDuration": 300
-        }
-    }
+    ]
 
 }
