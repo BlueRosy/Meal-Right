@@ -55,7 +55,7 @@ app.jinja_env.filters["getFattyAcidPolyunsaturated"] = getFattyAcidPolyunsaturat
 # Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_PERMANENT"] = False
 app.config["SECRET_KEY"] = 'mySecret'
-app.config['PERMANENT_SESSION_LIFETIME'] =  timedelta(minutes=30)
+app.config['PERMANENT_SESSION_LIFETIME'] =  timedelta(minutes=10)
 # app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://default:xOYnls4XI2ub@ep-withered-lake-46572808-pooler.us-east-1.postgres.vercel-storage.com/verceldb"
 # app.config["SESSION_TYPE"] = "sqlalchemy"
 # db = SQLAlchemy(app)
@@ -73,10 +73,7 @@ connect = psycopg2.connect(
     user = "default",
     password = "xOYnls4XI2ub",
     port="5432",
-    keepalives=1,
-    keepalives_idle=30,
-    keepalives_interval=10,
-    keepalives_count=5
+    keepalives=1
 )
 
 
